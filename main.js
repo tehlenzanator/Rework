@@ -1,17 +1,3 @@
-StructureSpawn.prototype.setSpawningClass = function (level, room, creeps, structures, resources) {
-  const {stage, energyAvailable, name, terminal} = room; 
-  const {containers, storage} = structures;
-  const {sources, mineral} = resources; 
-  const oldestCreep = creeps.oldestCreep; 
-  const timeTospawnNextCreep = this.getEarlySpawn(room, timeTospawnNextCreep, oldestCreep);
-  const spawnEarly = this.getEarlySpawn(room, timeToSpawnNextCreep, oldestCreep);
-
-  var sourcesLen = sources.length; 
-  var HarvesterLen = creeps.Harvester.length; 
-  var UpgraderLen = creeps.Upgrader.length;
-  
-
-
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
@@ -48,7 +34,100 @@ StructureSpawn.prototype.setSpawningLevel = function(spawnlvl, room, creeps, str
      //Check if the current spawn level is valid
      if(spawnlvl >= 1 && spawnlvl <=8) {
         const{capacity, available} = energyRequirements[spawnlvl - 1];
+
+        if(energyCapacityAvailable >= capacity) {
+            if(energyAvailable >= available) {
+                this.setSpawningClass(spawnlvl, room, creeps, structureTower, resources);
+            }
+        } else {
+            spawnlvl =- 1; //Decrease spawn level
+            this.setSpawningLevel(spawnlvl, room, creep, structure, resources);
+        }
+     } else {
+        spawnlvl =- 1; //Decrease spawn level
+            this.setSpawningLevel(spawnlvl, room, creep, structure, resources);
      }
+    switch (stage) {
+        case 1: //Stage 1 spawns, containers, extenstions, tower, ramparts, walls 
+        if(harvesters.length < 2) {
+            console.log('Spawning new harvester')
+            Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE],
+            {memory: {role: Harvester}});    
+            
+        }
+        if(builders.length < 2) {
+            console.log('Spawning new Builder')
+            Game.Spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE],
+            {memory: {role: builders}});
+        }
+        if(engineers.length < 2) {
+            console.log('Spawning new Engineer')
+            Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE],
+            {memory: {role: engineers}})
+        }
+        if(long.length < 2) {
+            console.log('Spawning Ranged creep')
+            Game.Spawns['spawn1'].spawnCreep([RANGED_ATTACK, TOUGH,MOVE,])
+        }
+        break;
+        case 2: //Stage 2 extenstions Towers, ramparts, walls, storage, terminal, labs, links 
+        if(harvesters.length < 3) {
+            Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY, MOVE],
+        {memory: {role: Long}});
+            }
+         if(builders.length < 3) {
+            console.log('Spawning new Builder')
+            Game.Spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE],
+            {memory: {role: builders}});
+        }
+        if(engineers.length < 2) {
+            console.log('Spawning new Engineer')
+            Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE],
+            {memory: {role: engineers}})
+        }
+        break;
+
+        case 3: //Stage 3 Observer, factory, powerspawn, nuker, defense creeps 
+        if(harvesters.length < 2) {
+            Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY, MOVE],
+        {memory: {role: Harvester}});
+            }
+         if(builders.length < 3) {
+            console.log('Spawning new Builder')
+            Game.Spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE],
+            {memory: {role: builders}});
+        }
+        if(engineers.length < 3) {
+            console.log('Spawning new Engineer')
+            Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE],
+            {memory: {role: engineers}})
+        }
+
+        break;
+        case 4: //Stage 4 Stronger creeps miner, upgraders, engineer
+        if(harvesters.length < 4) {
+            Game.spawns['Spawn1'].spawnCreep([WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE],
+            {memory: {role: Harvester}})
+
+
+        }
+
+        break;
+        case 5: //Stage 5 
+
+        break;
+        case 6: //Stage 6 
+
+        break;
+        case 7: //Stage 7 
+
+        break;
+        case 8: //Stage 8
+
+        default: 
+        break;
+    }
+
     
     
     
