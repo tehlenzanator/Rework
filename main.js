@@ -11,15 +11,15 @@ allyModel.setLocalAllies({
     'player1': true,
     'player2': true,
 });
-let room = Game.rooms[rooms];
-StructureSpawn.prototype.setSpawning = function (room, creeps, structures, resources) {
+let rooms = Game.rooms[rooms];
+StructureSpawn.prototype.setSpawning = function (rooms, creeps, structures, resources) {
     var spawnlvl = room.controller.level;
-    this.setSpawningLevel(spawnlvl, room, creeps, structures, resources);
+    this.setSpawningLevel(spawnlvl, rooms, creeps, structures, resources);
 }
-StructureSpawn.prototype.setSpawningLevel = function(spawnlvl, room, creeps, structures, resources) {
+StructureSpawn.prototype.setSpawningLevel = function(spawnlvl, rooms, creeps, structures, resources) {
     for(var name in Memory.creeos) if (!Game.creeps[name]) {delete Memory.creeps[name]}}
 
-    const {energyAvailable, energyCapacityAvailable} = room;
+    const {energyAvailable, energyCapacityAvailable} = rooms;
 // main.js
     allyModel.sync();
     const energyRequirements = [
