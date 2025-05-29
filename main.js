@@ -38,15 +38,15 @@ StructureSpawn.prototype.setSpawningLevel = function(spawnlvl, room, creeps, str
 
         if(energyCapacityAvailable >= capacity) {
             if(energyAvailable >= available) {
-                this.setSpawningClass(spawnlvl, room, creeps, structureTower, resources);
+                this.setSpawningClass(spawnlvl, rooms, creeps, structureTower, resources);
             }
         } else {
             spawnlvl =- 1; //Decrease spawn level
-            this.setSpawningLevel(spawnlvl, room, creep, structure, resources);
+            this.setSpawningLevel(spawnlvl, rooms, creep, structure, resources);
         }
      } else {
         spawnlvl =- 1; //Decrease spawn level
-            this.setSpawningLevel(spawnlvl, room, creep, structure, resources);
+            this.setSpawningLevel(spawnlvl, rooms, creep, structure, resources);
      }
     switch (stage) {
         case 1: //Stage 1 spawns, containers, extenstions, tower, ramparts, walls 
