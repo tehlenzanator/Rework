@@ -11,6 +11,7 @@ allyModel.setLocalAllies({
     'player1': true,
     'player2': true,
 });
+let room = Game.rooms[rooms];
 StructureSpawn.prototype.setSpawning = function (room, creeps, structures, resources) {
     var spawnlvl = room.controller.level;
     this.setSpawningLevel(spawnlvl, room, creeps, structures, resources);
