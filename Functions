@@ -1,0 +1,98 @@
+function creeps (creep, role) {
+    switch(creeps) {
+        case "harvester":
+        if(harvesters.length < 4) {
+                Game.spawns['spawn1'].spawnCreep([WORK, CARRY, MOVE],
+                    {memory: {role: 'harvester'}});
+        }
+        break;
+        case "superHarvester":
+            if(superHarvester.length < 2) {
+                Game.spawns['spawn1'].spawnCreep([WORK, WORK, CARRY, CARRY, MOVE],
+                    {memory: {role: 'superHarvester'}});
+                
+            }
+        break;
+        case "engineer":
+            if(setEngineer.length < 2) {
+                Game.spawns['spawn1'].spawnCreep([WORK, CARRY, MOVE],
+                    {memory: {role: 'engineer'}});
+            }
+        break;
+        case "upgraders":
+            if(setUpgrader.lengt < 2) {
+                Game.spawns['spawn1'].spawnCreep([WORK, CARRY, MOVE],
+                    {memory: {role: 'upgraders'}});
+                
+            }
+        break;
+        
+
+        }
+}
+
+
+function setHarvester (creep, deposits) {
+	for (var deposit in deposits) {
+    if (deposit.availableEnergy > 0) {
+      if (creep.pos.getRangeTo(deposit) <= 1) {
+        creep.harvest(deposit);
+      } else {
+				creep.moveTo(deposit);
+			}
+    }
+  }  
+}
+function setEngineer(creep, repair) {
+    for(var repair in repair) {
+        if ()
+    }
+
+}
+
+
+function setCreeps (creeps, deposits) {
+
+    for (var creep in creeps) {
+
+    	let role = creep.memory.role; //Set at spawn
+      
+      switch (role) {
+        case "harvester":
+				setHarvester(creep, deposits);
+                break;
+        case "engineer":
+                setEngineer(creep, repair)
+                break;
+        case "builder":
+                setBuilder(creep, storage)
+                break;
+        case "runner":
+                setRunner(creep, storage)
+                break;
+        case "upgrader":
+                setUpgrader(creep, storage)
+                break;
+        case "Long":
+                setLong(creep, defense)
+                break;
+        default: false
+				
+
+      }
+    }
+}
+
+Main() = {
+function GetCreeps (spawn,creeps) {
+
+}
+//Function to get creeps, NEEDS TO BE WRITTEN
+//var creeps = getCreeps();
+//Function to get deposits, NEEDS TO BE WRITTEN
+//var deposits = getDeposits();
+
+setCreeps(creeps, deposits);
+
+
+}
