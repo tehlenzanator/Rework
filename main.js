@@ -20,7 +20,8 @@ StructureSpawn.prototype.setSpawning = function (rooms, creeps, structures, reso
 StructureSpawn.prototype.setSpawningLevel = function(spawnlvl, rooms, creeps, structures, resources) {
     for(var name in Memory.creeps) if (!Game.creeps[name]) {delete Memory.creeps[name]}}
 
-    const {energyAvailable, energyCapacityAvailable} = rooms;
+   const energyAvailable = room.energyAvailable;
+const energyCapacityAvailable = room.energyCapacityAvailable; 
 
     allyModel.sync();
     const energyRequirements = [
