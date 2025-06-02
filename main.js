@@ -1,138 +1,102 @@
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
+var spawnModule = require('spawnModule');
 var roleEngineer = require('role.engineer');
 var structureTower = require('structure.tower');
 var roleLong = require('role.long');
 var roleRunner = require('role.runner');
+var rolesuperHarvester = require('role.superHarvester');
 const allyModel = require('./allyModel');
 
 allyModel.setLocalAllies({
     'player1': true,
     'player2': true,
 });
-
-StructureSpawn.prototype.setSpawning = function (rooms, creeps, structures, resources) {
-    var spawnlvl = this.room.controller.level;
-    this.setSpawningLevel(spawnlvl, rooms, creeps, structures, resources);
-}
-
-StructureSpawn.prototype.setSpawningLevel = function(spawnlvl, rooms, creeps, structures, resources) {
-    for(var name in Memory.creeps) if (!Game.creeps[name]) {delete Memory.creeps[name]}}
-
-   const energyAvailable = room.energyAvailable;
-const energyCapacityAvailable = room.energyCapacityAvailable; 
+module.exports.loop = function () {
+// main.js
 
     allyModel.sync();
-    const energyRequirements = [
-    {stage: 1, capacity: 300, available: 300},
-    {stage: 2,  capacity: 600, available: 600}, 
-    {stage: 3,  capacity: 900, available: 900},
-    {stage: 4,  capacity: 1200, available: 1200}, 
-    {stage: 5,  capacity: 1700, available: 1700},
-    {stage: 6,  capacity: 2300, available:2300},
-    {stage: 7,  capacity: 5300, available: 2300},
-    {stage: 8, capacity: 12300, available: 2600}
-    ];
-     //Check if the current spawn level is valid
-     if(spawnlvl >= 1 && spawnlvl <=8) {
-        const{capacity, available} = energyRequirements[spawnlvl - 1];
 
-        if(energyCapacityAvailable >= capacity) {
-            if(energyAvailable >= available) {
-                this.setSpawningClass(spawnlvl, rooms, creeps, structureTower, resources);
-            }
-        } else {
-            spawnlvl =- 1; //Decrease spawn level
-            this.setSpawningLevel(spawnlvl, rooms, creep, structure, resources);
+    spawnModule.exampleFunction();
+    var result = spawnModule.exampleFunction2(10);
+    
+    for(var name in Memory.creeps) {
+        if(!Game.creeps[name]) {
+            delete Memory.creeps[name];
+            console.log('Clearing non-existing creep memory:', name);
         }
-     } else {
-        spawnlvl =- 1; //Decrease spawn level
-            this.setSpawningLevel(spawnlvl, rooms, creep, structure, resources);
-     }
-    switch (stage) {
-        case 1: //Stage 1 spawns, containers, extenstions, tower, ramparts, walls 
-        if(harvesters.length < 2) {
-            console.log('Spawning new harvester')
-            Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE],
-            {memory: {role: Harvester}});    
-            
-        }
-        if(builders.length < 2) {
-            console.log('Spawning new Builder')
-            Game.Spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE],
-            {memory: {role: builders}});
-        }
-        if(engineers.length < 2) {
-            console.log('Spawning new Engineer')
-            Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE],
-            {memory: {role: engineers}})
-        }
-        if(long.length < 2) {
-            console.log('Spawning Ranged creep')
-            Game.Spawns['spawn1'].spawnCreep([RANGED_ATTACK, TOUGH,MOVE,])
-        }
-        break;
-        case 2: //Stage 2 extenstions Towers, ramparts, walls, storage, terminal, labs, links 
-        if(harvesters.length < 3) {
-            Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY, MOVE],
-        {memory: {role: Long}});
-            }
-         if(builders.length < 3) {
-            console.log('Spawning new Builder')
-            Game.Spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE],
-            {memory: {role: builders}});
-        }
-        if(engineers.length < 2) {
-            console.log('Spawning new Engineer')
-            Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE],
-            {memory: {role: engineers}})
-        }
-        break;
-
-        case 3: //Stage 3 Observer, factory, powerspawn, nuker, defense creeps 
-        if(harvesters.length < 2) {
-            Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY, MOVE],
-        {memory: {role: Harvester}});
-            }
-         if(builders.length < 3) {
-            console.log('Spawning new Builder')
-            Game.Spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE],
-            {memory: {role: builders}});
-        }
-        if(engineers.length < 3) {
-            console.log('Spawning new Engineer')
-            Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE],
-            {memory: {role: engineers}})
-        }
-
-        break;
-        case 4: //Stage 4 Stronger creeps miner, upgraders, engineer
-        if(harvesters.length < 4) {
-            Game.spawns['Spawn1'].spawnCreep([WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE],
-            {memory: {role: Harvester}})
-
-
-        }
-
-        break;
-        case 5: //Stage 5 
-
-        break;
-        case 6: //Stage 6 
-
-        break;
-        case 7: //Stage 7 
-
-        break;
-        case 8: //Stage 8
-
-        default: 
-        break;
     }
-
+    var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
+    console.log('Builders: ' + builders.length);
+    var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
+    console.log('Upgraders: ' + upgraders.length);
+    var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
+    console.log('Harvesters: ' + harvesters.length);
+    var engineers = _.filter(Game.creeps, (creep) => creep.memory.role == 'engineer');
+    console.log('Engineers: ' + engineers.length);
+    var long = _.filter(Game.creeps, (creep) => creep.memory.role == 'long');
+    console.log('long range: ' + long.length);
+    var runner =_.filter(Game.creeps, (creep) => creep.memory.role == 'runner');
+    console.log('runner: ' + runner.length);
+    var superHarvester = _.filter(Game.creeps, (creep) => creep.memory.role == 'superHarvester');
+    console.log('superHarvester: + superHarvester'.length)
+    //auto spawn a harvester, if it is less than 2 
     
+    if(harvesters.length < 4) {
+        var newName = 'Harvester' + Game.time;
+        console.log('Spawning new harvester: ' + newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY,MOVE], newName, 
+            {memory: {role: 'harvester'}});
     
+    }
+        //auto spawn a upgrader, if less than 2 
+        
+    else if(upgraders.length < 2) {
+        var newName = 'Upgrader' + Game.time;
+        console.log('Spawning new upgrader' + newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName,
+        {memory: {role: 'upgrader'}});
+    }
+    //auto spawn a builder if it is less than 2
+    
+    else if(builders.length < 2) {
+       var newName = 'Builder' + Game.time;
+        console.log('Spawning new builder ' + newName);
+       Game.spawns['Spawn1'].spawnCreep([ WORK, CARRY, MOVE], newName,
+        {memory: {role: 'builder'}});
+    }
+    else if(engineers.length < 1) {
+        var newName = 'Engineer' + Game.time;
+        console.log('Spawning new engineer ' + newName);
+        Game.spawns['Spawn1'].spawnCreep([ WORK, CARRY, MOVE], newName,
+        {memory: {role: 'engineer'}});
+    }
+    else if(long.length < 4) {
+        var newName = 'Range' + Game.time;
+        console.log('Spawning new ranger ' + newName);
+        Game.spawns['Spawn1'].spawnCreep([RANGED_ATTACK,RANGED_ATTACK, MOVE, TOUGH, TOUGH], newName,
+        {memory: {role: 'long'}});
+    }
+    else if(runner.length < 2) {
+        var newName = 'runner' + Game.time;
+        console.log('Spawning new runner ' + newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName,
+        {memory: {role: 'runner'}});
+    }
+    else if(superHarvester.length < 2) {
+        var newName = ('superHarvester' + newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK, WORK, CARRY, CARRY, MOVE], newName,
+        {memory: {role: 'superHarvester'}});
+    }
+    else if(Game.spawns['Spawn1'].spawning) { 
+        var spawningCreep = Game.creeps[Game.spawns['Spawn1'].spawning.name];
+        Game.spawns['Spawn1'].room.visual.text(
+            '🛠️' + spawningCreep.memory.role,
+            Game.spawns['Spawn1'].pos.x + 1, 
+            Game.spawns['Spawn1'].pos.y, 
+            {align: 'left', opacity: 0.8});
+    }
     
     for (let rooms in Game.room) {
         let room = Game.rooms[rooms];
@@ -158,7 +122,11 @@ const energyCapacityAvailable = room.energyCapacityAvailable;
         else if(creep.memory.role == 'runner') {
             roleRunner.run(creep);
         }
+        else if(creep.memory.role == 'superHarvester') {
+            rolesuperHarvester.run(creep);
+        }
 
     }
  
 
+}
