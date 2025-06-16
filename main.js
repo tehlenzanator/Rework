@@ -1,4 +1,4 @@
-spawnModule.exports.loop = function() {
+//Get roles from other scripts and import 
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
@@ -7,143 +7,125 @@ var roleEngineer = require('role.engineer');
 var structureTower = require('structure.tower');
 var roleLong = require('role.long');
 var roleRunner = require('role.runner');
+var rolesuperHarvester = require('role.superHarvester');
 const allyModel = require('./allyModel');
+
+//creep memory 
+ var builders = _.filter(Game.creeps, (creep) => creep.memory.role === 'builder');
+    console.log('Builders:', builders.length);
+
+var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role === 'upgrader');
+    console.log('Upgraders:', upgraders.length);
+
+var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role === 'harvester');
+    console.log('Harvesters:', harvesters.length);
+
+var engineers = _.filter(Game.creeps, (creep) => creep.memory.role === 'engineer');
+    console.log('Engineers:', engineers.length);
+
+var longRange = _.filter(Game.creeps, (creep) => creep.memory.role === 'long');
+    console.log('Long range:', longRange.length);
+
+var runners = _.filter(Game.creeps, (creep) => creep.memory.role === 'runner');
+    console.log('Runners:', runners.length);
+
+var superHarvesters = _.filter(Game.creeps, (creep) => creep.memory.role === 'superHarvester');
+    console.log('Super Harvesters:', superHarvesters.length);
+
+allyModel.setLocalAllies({
+    'player1': true,
+    'player2': true,
+});
+
+module.exports.loop = function () {
+    // Sync ally data
+    allyModel.sync();
+}
+
+  // Cleanup memory for dead creeps
+    for (var name in Memory.creeps) {
+        if (!Game.creeps[name]) {
+            delete Memory.creeps[name];
+            console.log('Clearing non-existing creep memory:', name);
+        }
+    }
+    // Manage towers safely
+    let room = 'E27S58';
+    if(Structure) {
+        if(structureTower) { 
+            structureTower.run(room);
+        }
+    }
+    //Spawn notifcation 
+if(Game.spawns['Spawn1'].spawning) {
+        let spawningCreep = Game.creeps[Game.spawns['Spawn1'].spawning.name];
+        Game.spawns['Spawn1'].room.visual.text(
+          '🛠️' + spawningCreep.memory.role,
+          Game.spawns['Spawn1'].pos.x + 1,
+          Game.spawns['Spawn1'].pos.y,
+          {align: 'left', opacity: 0.8}
+
+        )
+    }
+
    
-var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
-    console.log('Builders: ' + builders.length);
-var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
-    console.log('Upgraders: ' + upgraders.length);
-var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
-    console.log('Harvesters: ' + harvesters.length);
-var engineers = _.filter(Game.creeps, (creep) => creep.memory.role == 'engineer');
-    console.log('Engineers: ' + engineers.length);
-var long = _.filter(Game.creeps, (creep) => creep.memory.role == 'long');
-    console.log('long range: ' + long.length);
-var runners =_.filter(Game.creeps, (creep) => creep.memory.role == 'runner');
-    console.log('runner: ' + runner.length);
-var superHarvester=_.filter(Game.creeps, (creep) => creep.memory.role == 'superHarvester');
-    console.log('superHarvesters: ' + superHarvester.length);
-}
-creeps();
 
-function creeps(creep, role) {
-    switch(role) {
-        case "harvester":
-        if(harvesters.length < 4) {
-               Game.spawns['spawn1'].spawnCreep([WORK, CARRY, MOVE], 'Harvester' + '_' + Game.time, {
-              memory: { role: 'harvester' }
-            });
-        }
-        break;
-        case "superHarvester":
-            if(superHarvester.length < 2) {
-                Game.spawns['spawn1'].spawnCreep([WORK, WORK, CARRY, CARRY, MOVE], 'superHarvester' + '_' + Game.time, {
-                memory: { role: 'superHarvester' }
-            });
+ // Spawn and memory for creeps 
+function spawning() {
+    
+    //harvester Spawn logic 
+    if(harvesters.length < 2) {
+        let newName = 'Harvester' + Game.time;
+        console.log('spawning new harvester:', newName)
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {memory: {role: 'harvester' }});
+        roleHarvester.run(creep);
+        }   
             
-                
-            }
-        break;
-        case "engineer":
-            if(engineers.length < 2) {
-                Game.spawns['spawn1'].spawnCreep([WORK, CARRY, MOVE], 'engineer' + '_' + Game.time, {
-                    memory: {role: 'engineer'}
-                });
-
-        }
-        break;
-        case "upgraders":
-            if(upgraders.length < 2) {
-                Game.spawns['spawn1'].spawnCreep([WORK, CARRY, MOVE], 'upgraders' + '_' + Game.time, {
-            memory: {role: 'upgraders'}
-                });
-                
-        }
-        break;
-        case "runner":
-            if(runners.length < 2) {
-                Game.spawns['spawn1'].spawnCreep([WORK, CARRY, MOVE], 'runner' + '_' + Game.time, {
-                    memory: {role: 'runner'}
-                
-                });
-            }
-            break;
-        default:
-    console.log(`Unknown role: ${role}. Check your creep assignment logic.`);
-            }
-
-        
-
+    //Upgrader
+    if(upgraders.length < 2) {
+        let newName = 'Upgrader' + Game.time;
+        console.log('spawning new upgrader:', newName)
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY,MOVE], newName, {memory: {role: 'upgrader'}});
+        roleUpgrader.run(creep);
         }
 
-
-
-function setHarvesters (creep, deposits) {
-	for (var deposit in deposits) {
-    if (deposit.availableEnergy > 0) {
-      if (creep.pos.getRangeTo(deposit) <= 1) {
-            creep.harvest(deposit);
-      } else {
-				creep.moveTo(deposit);
-			}
+    //Builders        
+    if(builders.length < 2) {
+        let newName = 'Builder' + Game.time; 
+        console.log('spawning new builder:', newName)
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {Memory: {role: 'Builder'}});
+        roleBuilder.run(creep);
+        }
+    //engineers
+    if(engineers.length < 2) {
+        let newName = 'Engineer' + Game.time;
+        console.log('Spawning new engineer', newName)
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {Memory: {role: 'Engineer'}});
+        roleEngineer.run(creep);
+        }
+    //runners
+    if(runners.length < 2) {
+        let newName = 'Runner' + Game.time;
+        console.log('Spawning new runner', newName)
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {Memory: {role: 'Runner'}});
+        roleRunner.run(creep);
     }
-  }  
-}
-function setEngineer(creep, repairs) {
-    for(var repair in repairs) {
-        
+    //Long Range creeps 
+    if(longRange.length < 4) {
+        let newName = 'Range' + Game.time;
+        console.log('spawning new ranger', newName)
+        Game.spawns['Spawn1'].spawnCreep([RANGED_ATTACK, MOVE, TOUGH], newName, {Memory: {role: 'longRange'}});
+        roleLong.run(creep);
+    }
+    //Super harvester
+    if(superHarvesters.length > 1) {
+        let newName = 'SuperHarvester' + Game.time;
+        console.log('Spawning new Super harvester', newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK, WORK, CARRY, CARRY, MOVE], newName, {Memory: {role: 'Super Harvester'}});
+        rolesuperHarvester.run(creep);
+    }
+spawning();
     }
 
-}
-
-
-function setCreeps (creeps, role) {
-
-    for (var creep in creeps) {
-
-    	let role = creep.memory.role; //Set at spawn
-      
-      switch (role) {
-        case "harvester":
-				setHarvester(creep, deposits);
-                break;
-        case "engineer":
-                setEngineer(creep, repair)
-                break;
-        case "builder":
-                setBuilder(creep, storage)
-                break;
-        case "runner":
-                setRunner(creep, storage)
-                break;
-        case "upgrader":
-                setUpgrader(creep, storage)
-                break;
-        case "Long":
-                setLong(creep, defense)
-                break;
-        case "superHarvester":
-                setSuperHarvester(creep,deposits)
-                break;
-        default: false
-				
-
-      }
-    }
-}
-function GetCreeps (spawn,creeps) {
-
-
-}
-function setCreeps(creeps, deposits) {
-
-}
-
-Main() = {
-
-//Function to get creeps, NEEDS TO BE WRITTEN
-//var creeps = getCreeps();
-//Function to get deposits, NEEDS TO BE WRITTEN
-//var deposits = getDeposits();
-
-}
+    
+    
