@@ -1,4 +1,6 @@
+//WIP
 //Get roles from other scripts and import 
+
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
@@ -9,6 +11,10 @@ var roleLong = require('role.long');
 var roleRunner = require('role.runner');
 var rolesuperHarvester = require('role.superHarvester');
 const allyModel = require('./allyModel');
+module.exports.loop = function () {
+
+spawnModule.exampleFunction();
+var result = spawnModule.exampleFunction2(10);
 
 //creep memory 
  var builders = _.filter(Game.creeps, (creep) => creep.memory.role === 'builder');
@@ -17,8 +23,8 @@ const allyModel = require('./allyModel');
 var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role === 'upgrader');
     console.log('Upgraders:', upgraders.length);
 
-var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role === 'harvester');
-    console.log('Harvesters:', harvesters.length);
+var harvester = _.filter(Game.creeps, (creep) => creep.memory.role === 'harvester');
+    console.log('Harvesters:', harvester.length);
 
 var engineers = _.filter(Game.creeps, (creep) => creep.memory.role === 'engineer');
     console.log('Engineers:', engineers.length);
@@ -37,18 +43,13 @@ allyModel.setLocalAllies({
     'player2': true,
 });
 
-module.exports.loop = function () {
+
     // Sync ally data
     allyModel.sync();
-}
 
-  // Cleanup memory for dead creeps
-    for (var name in Memory.creeps) {
-        if (!Game.creeps[name]) {
-            delete Memory.creeps[name];
-            console.log('Clearing non-existing creep memory:', name);
-        }
-    }
+
+        
+    
     // Manage towers safely
     let room = 'E27S58';
     if(Structure) {
@@ -71,10 +72,67 @@ if(Game.spawns['Spawn1'].spawning) {
    
 
  // Spawn and memory for creeps 
-function spawning() {
+
     
+
+function memory() {
+  for (var name in Game.creeps) {
+        var creep = Game.creeps[name];
+        if (!creep || !creep.memory) continue;
+        
+        switch (creep.memory.role) {
+            case 'harvester':
+                roleHarvester.run(creep);
+                break;
+            case 'upgrader':
+                roleUpgrader.run(creep);
+                break;
+            case 'builder':
+                roleBuilder.run(creep);
+                break;
+            case 'engineer':
+                roleEngineer.run(creep);
+                break;
+            case 'long':
+                roleLong.run(creep);
+                break;
+            case 'runner':
+                roleRunner.run(creep);
+                break;
+            case 'superHarvester':
+                rolesuperHarvester.run(creep);
+                break;
+           
+                }
+            
+
+
+         }
+    }
+memory()
+
+
+
+var creep = Game.creeps[name];
+  // Cleanup memory for dead creeps
+    for (var name in Memory.creeps) {
+        if (!Game.creeps[name]) {
+            delete Memory.creeps[name];
+            console.log('Clearing non-existing creep memory:', name)
+        }
+    }
+     for (var name in Memory.creeps) {
+        if (!Game.creeps[name]) {
+            delete Memory.creeps[name];
+            console.log('Clearing non-existing creep memory:', name);
+        }
+     }
+
+function spawning() {
+   var creep = Game.creeps[name];
+    console.log('here I am');
     //harvester Spawn logic 
-    if(harvesters.length < 2) {
+    if(harvester.length < 2) {
         let newName = 'Harvester' + Game.time;
         console.log('spawning new harvester:', newName)
         Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {memory: {role: 'harvester' }});
@@ -86,46 +144,47 @@ function spawning() {
         let newName = 'Upgrader' + Game.time;
         console.log('spawning new upgrader:', newName)
         Game.spawns['Spawn1'].spawnCreep([WORK, CARRY,MOVE], newName, {memory: {role: 'upgrader'}});
-        roleUpgrader.run(creep);
+    
         }
 
     //Builders        
     if(builders.length < 2) {
         let newName = 'Builder' + Game.time; 
         console.log('spawning new builder:', newName)
-        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {Memory: {role: 'Builder'}});
-        roleBuilder.run(creep);
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {Memory: {role: 'builder'}});
+        
         }
     //engineers
     if(engineers.length < 2) {
         let newName = 'Engineer' + Game.time;
         console.log('Spawning new engineer', newName)
-        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {Memory: {role: 'Engineer'}});
-        roleEngineer.run(creep);
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {Memory: {role: 'engineer'}});
+        
         }
     //runners
     if(runners.length < 2) {
         let newName = 'Runner' + Game.time;
         console.log('Spawning new runner', newName)
         Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {Memory: {role: 'Runner'}});
-        roleRunner.run(creep);
+        
     }
     //Long Range creeps 
-    if(longRange.length < 4) {
+    if(longRange.length < 1) {
         let newName = 'Range' + Game.time;
         console.log('spawning new ranger', newName)
-        Game.spawns['Spawn1'].spawnCreep([RANGED_ATTACK, MOVE, TOUGH], newName, {Memory: {role: 'longRange'}});
-        roleLong.run(creep);
+        Game.spawns['Spawn1'].spawnCreep([RANGED_ATTACK, MOVE, TOUGH], newName, {Memory: {role: 'long'}});
+        
     }
     //Super harvester
-    if(superHarvesters.length > 1) {
+    if(superHarvesters.length < 1) {
         let newName = 'SuperHarvester' + Game.time;
         console.log('Spawning new Super harvester', newName);
         Game.spawns['Spawn1'].spawnCreep([WORK, WORK, CARRY, CARRY, MOVE], newName, {Memory: {role: 'Super Harvester'}});
-        rolesuperHarvester.run(creep);
-    }
-spawning();
-    }
+       }
+       return;
+        }
+    spawning()
+}
 
-    
-    
+
+
