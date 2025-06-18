@@ -1,4 +1,5 @@
 //rewrite 
+//TypeError: creeps is not iterable
 var spawnModule = require('spawnModule')
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
