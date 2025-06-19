@@ -1,6 +1,4 @@
-//rewrite 
-//TypeError: creeps is not iterable
-var spawnModule = require('spawnModule')
+//working code
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
@@ -10,78 +8,147 @@ var structureTower = require('structure.tower');
 var roleLong = require('role.long');
 var roleRunner = require('role.runner');
 var rolesuperHarvester = require('role.superHarvester');
-var structureTower = require('structure.tower')
 const allyModel = require('./allyModel');
+
+allyModel.setLocalAllies({
+    'player1': true,
+    'player2': true,
+});
+
 module.exports.loop = function () {
-var runners = _.filter(Game.creeps, (creep) => creep.memory.role === 'Runner');
-console.log('Runners:', runners.length);
-var superHarvester = _.filter(Game.creep, (creep) => creep.memory.role === 'superHarvester');
-console.log('Super Harvesters:', superHarvester.length);
-var Upgrader =_.filter(Game.creep, (creep) => creep.memory.role ==='Upgraders');
-console.log('Upgraders:', Upgrader.length);
-var Builder = _.filter(Game.creep, (creep) => creep.memory.role === 'Builder');
-console.log('Builder:', Builder.length);
-var Engineer = _.filter(Game.creep, (creep) => creep.memory.role === 'Engineer');
-console.log('Engineer',Engineer.length);
-var Long = _.filter(Game.creep, (creep) => creep.memory.role === 'Engineer');
+    // Sync ally data
+    allyModel.sync();
+
+    // Example function calls from spawnModule
+    spawnModule.exampleFunction();
+    var result = spawnModule.exampleFunction2(10);
+
+    // Cleanup memory for dead creeps
+    for (var name in Memory.creeps) {
+        if (!Game.creeps[name]) {
+            delete Memory.creeps[name];
+            console.log('Clearing non-existing creep memory:', name);
+        }
+    }
+    // Manage towers safely
+    let room = 'E27S58';
+    if(Structure) {
+        if(structureTower) { 
+            structureTower.run(room);
+        }
+    }
+    // Display spawning notification
+    if (Game.spawns['Spawn1'].spawning) {
+        let spawningCreep = Game.creeps[Game.spawns['Spawn1'].spawning.name];
+        Game.spawns['Spawn1'].room.visual.text(
+            '🛠️' + spawningCreep.memory.role,
+            Game.spawns['Spawn1'].pos.x + 1,
+            Game.spawns['Spawn1'].pos.y,
+            {align: 'left', opacity: 0.8}
+        );
+    }
+    //Transfer energy between Links 
+  links = function (links) {
+        const transferEnergy = (source, target) => {
+            if (source.cooldown === 0 && source.energy > 600) {
+                const openCapacity = target.energyCapacity - target.energy
+                const energyAvailable = source.energy;
+                const amounttoTransfer = Math.min(energyAvailable, openCapacity, 300);
+                source.transferEnergy(target, amounttoTransfer);
+                transferEnergy(links[0], links[2]);
+            }
+
+        }
+    };
+    
+
+    
+
+    // Count creeps by role safely
+    var builders = _.filter(Game.creeps, (creep) => creep.memory.role === 'builder');
+    console.log('Builders:', builders.length);
+
+    var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role === 'upgrader');
+    console.log('Upgraders:', upgraders.length);
+
+    var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role === 'harvester');
+    console.log('Harvesters:', harvesters.length);
+
+    var engineers = _.filter(Game.creeps, (creep) => creep.memory.role === 'engineer');
+    console.log('Engineers:', engineers.length);
+
+    var longRange = _.filter(Game.creeps, (creep) => creep.memory.role === 'long');
+    console.log('Long range:', longRange.length);
+
+    var runners = _.filter(Game.creeps, (creep) => creep.memory.role === 'runner');
+    console.log('Runners:', runners.length);
+
+    var superHarvesters = _.filter(Game.creeps, (creep) => creep.memory.role === 'superHarvester');
+    console.log('Super Harvesters:', superHarvesters.length);
 
 
 
-for (var creep of creeps) {
-  var creeps = Game.creeps;  
-  var memory = creep.memory;
-  if(memory.role == "Harvester") {roleHarvester.run(creep);}
-  if(memory.role == 'Upgrader') {roleUpgrader.run(creep);}
-  if(memory.role == 'Builder') {roleBuilder.run(creep);}
-  if(memory.role == 'Engineer') {roleEngineer.run(creep);}
-  if(memory.role == 'Long') {roleLong.run(creep);}
-  if(memory.role == "Runner") {roleRunner.run(creep);} //Do this for all the roles
-  if(memory.role == 'superHarvester') {rolesuperHarvester.run(creep);}
-
-  
-}
-function spawning(Harvester, Upgrader, Builder, Engineer, Long, Runner, superHarvesters) { //Only pass what you need until you need it
-
-    const spawn = Game.spawns['Spawn1']; //Localize
-    if (!spawn.spawning) {
-      if (runners.length < 2) {
-          let newName = 'Runners' + Game.time;
-          console.log('Spawning new runner:', newName);
-          spawn.spawnCreep([WORK, CARRY, MOVE], newName, {memory: {role: 'runner'}});
-          return; //Only spawn one thing at a time
-      } else if (superHarvesters.length < 1) {
-          let newName = 'SuperHarvesters' + Game.time;
-          console.log('Spawning new superHarvester:', newName);
-          spawn.spawnCreep([WORK, WORK, CARRY, CARRY, MOVE], newName, {memory: {role: 'superHarvester'}});
-          return; //Only spawn one thing at a time
-      } else if(Harvester.length < 2) {
+    // Auto-spawning logic for maintaining workforce balance
+    if (harvesters.length < 2) {
         let newName = 'Harvester' + Game.time;
-        console.log('Spawning new Harvester:', newName);
-        spawn.spawnCreep([WORK, CARRY, MOVE], newName, {memory: {role: 'Harvester'}});
-        return;
-      }else if(Upgrader.length < 2) {
+        console.log('Spawning new harvester:', newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {memory: {role: 'harvester'}});
+    } else if (upgraders.length < 2) {
         let newName = 'Upgrader' + Game.time;
-        console.log('Spawning new Upgrader:', newName);
-        spawn.spawnCreep([WORK, CARRY, MOVE], newName, {memory: {role: 'Upgrader'}});
-        return;
-      }else if(Builder.length < 2) {
+        console.log('Spawning new upgrader:', newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {memory: {role: 'upgrader'}});
+    } else if (builders.length < 2) {
         let newName = 'Builder' + Game.time;
-        console.log('Spawning new Upgrader:', newName);
-        spawn.spawnCreep([WORK, CARRY, MOVE], newName, {memory: {role: 'Builder'}});
-        return;
-      }else if(Engineer.length < 2) {
+        console.log('Spawning new builder:', newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {memory: {role: 'builder'}});
+    } else if (engineers.length < 2) {
         let newName = 'Engineer' + Game.time;
-        console.log('Spawning new Engineer:', newName);
-        spawn.spawnCreep([WORK, CARRY, MOVE], newName, {memory: {role: 'Engineer'}})
-        return;
-      }else if(Long.length < 4) {
-        let newName = 'Long' + Game.time;
-        console.log('Spawning new Ranger:' + newName);
-        spawn.spawnCreep([RANGED_ATTACK, MOVE,], newName, {memory: {role: 'Long'}});
-        return;
+        console.log('Spawning new engineer:', newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {memory: {role: 'engineer'}});
+    } else if (longRange.length < 4) {
+        let newName = 'Ranger' + Game.time;
+        console.log('Spawning new ranger:', newName);
+        Game.spawns['Spawn1'].spawnCreep([RANGED_ATTACK, MOVE, TOUGH], newName, {memory: {role: 'long'}});
+    } else if (runners.length < 2) {
+        let newName = 'Runner' + Game.time;
+        console.log('Spawning new runner:', newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, {memory: {role: 'runner'}});
+    } else if (superHarvesters.length < 1) {
+        let newName = 'SuperHarvester' + Game.time;
+        console.log('Spawning new superHarvester:', newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK, WORK, CARRY, CARRY, MOVE], newName, {memory: {role: 'superHarvester'}});
+    } 
+    
+
+    
+    // Execute roles with added safety checks
+    for (var name in Game.creeps) {
+        var creep = Game.creeps[name];
+        if (!creep || !creep.memory) continue; // Ensures creep exists before running role functions
+
+        switch (creep.memory.role) {
+            case 'harvester':
+                roleHarvester.run(creep);
+                break;
+            case 'upgrader':
+                roleUpgrader.run(creep);
+                break;
+            case 'builder':
+                roleBuilder.run(creep);
+                break;
+            case 'engineer':
+                roleEngineer.run(creep);
+                break;
+            case 'long':
+                roleLong.run(creep);
+                break;
+            case 'runner':
+                roleRunner.run(creep);
+                break;
+            case 'superHarvester':
+                rolesuperHarvester.run(creep);
+                break;
+          
             }
         }
     }
-  spawning(Harvester, Upgrader, Builder, Engineer, Long, Runner, superHarvesters);
-}
-  
