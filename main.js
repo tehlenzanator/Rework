@@ -12,7 +12,7 @@ var roleRunner = require('role.runner');
 var rolesuperHarvester = require('role.superHarvester');
 var structureTower = require('structure.tower')
 const allyModel = require('./allyModel');
-
+module.exports.loop = function () {
 var runners = _.filter(Game.creeps, (creep) => creep.memory.role === 'Runner');
 console.log('Runners:', runners.length);
 var superHarvester = _.filter(Game.creep, (creep) => creep.memory.role === 'superHarvester');
@@ -25,11 +25,11 @@ var Engineer = _.filter(Game.creep, (creep) => creep.memory.role === 'Engineer')
 console.log('Engineer',Engineer.length);
 var Long = _.filter(Game.creep, (creep) => creep.memory.role === 'Engineer');
 
-const creeps =  Game.creeps; //Now you only need to get the creeps ONCE
+
 
 for (var creep of creeps) {
-
-  const memory = creep.memory;
+  var creeps = Game.creeps;  
+  var memory = creep.memory;
   if(memory.role == "Harvester") {roleHarvester.run(creep);}
   if(memory.role == 'Upgrader') {roleUpgrader.run(creep);}
   if(memory.role == 'Builder') {roleBuilder.run(creep);}
@@ -79,8 +79,9 @@ function spawning(Harvester, Upgrader, Builder, Engineer, Long, Runner, superHar
         console.log('Spawning new Ranger:' + newName);
         spawn.spawnCreep([RANGED_ATTACK, MOVE,], newName, {memory: {role: 'Long'}});
         return;
-          }
-      }
-  }
+            }
+        }
+    }
+  spawning(Harvester, Upgrader, Builder, Engineer, Long, Runner, superHarvesters);
+}
   
-spawning();
