@@ -8,7 +8,7 @@ var spawnModule = require('spawnModule');
 var roleEngineer = require('role.engineer');
 var structureTower = require('structure.tower');
 var roleLong = require('role.long');
-var roleRunner = require('role.runner');
+var roleRunner = require('role.Runner');
 var roleSuperHarvester = require('role.superHarvester');
 var structureTower = require('structure.tower')
 const allyModel = require('./allyModel');
@@ -30,6 +30,7 @@ var Long = _.filter(Game.creep, (creep) => creep.memory.role === 'Long');
 
 for (var creep of Object.values(Game.creeps)) {
  var memory = creep.memory;
+ if(!creep || !creep.memory) continue; 
   if(memory.role == "Harvester") {roleHarvester.run(creep);}
   else if(memory.role == 'Upgrader') {roleUpgrader.run(creep);}
   else if(memory.role == 'Builder') {roleBuilder.run(creep);}
@@ -38,16 +39,30 @@ for (var creep of Object.values(Game.creeps)) {
   else if(memory.role == "Runner") {roleRunner.run(creep);} //Do this for all the roles
   else if(memory.role == 'superHarvester') {roleSuperHarvester.run(creep);}
   }
-}
-  spawning(Runner, superHarvester, harvester, Upgrader, Builder, Engineer, Long)
 
-function spawning(runners , superHarvester, harvester, Upgrader, Builder, Engineer, Long) {
+  let room = 'E27S58';
+if(Structure) {
+    if(structureTower) {
+        structureTower.run(room) 
+
+        }
+    }
+
+allyModel.sync();
+ spawnModule.exampleFunction();
+    var result = spawnModule.exampleFunction2(10);
+    spawning(runners, superHarvester, harvester, Upgrader, Builder, Engineer, Long)
+}
+  
+
+
+function spawning(runners, superHarvester, harvester, Upgrader, Builder, Engineer, Long) {
     const spawn = Game.spawns['Spawn1'];
     let totalRunners = runners.length; 
     let totalSuperHarvesters = superHarvester.length;
     let totalHarvesters = harvester.length; 
     let totalUpgraders = Upgrader.length;
-    let totalbuilders = Builder.length; 
+    let totalBuilders = Builder.length; 
     let totalEngineers = Engineer.length;
     let totalLongs = Long.length;
 
@@ -76,7 +91,7 @@ function spawning(runners , superHarvester, harvester, Upgrader, Builder, Engine
             spawn.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'Upgrader' } });
             return;
         }
-        else if (totalbuilders < 2) {
+        else if (totalBuilders < 2) {
             let newName = 'Builder' + Game.time;
             console.log('Spawning new Builder:', newName);
             spawn.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'Builder' } });
@@ -94,5 +109,7 @@ function spawning(runners , superHarvester, harvester, Upgrader, Builder, Engine
             spawn.spawnCreep([RANGED_ATTACK, MOVE], newName, { memory: { role: 'Long' } });
             return;
         }
-     }
-   }
+    }
+}
+
+
