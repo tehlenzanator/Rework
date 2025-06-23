@@ -28,18 +28,28 @@ var Engineer = _.filter(Game.creep, (creep) => creep.memory.role === 'Engineer')
 console.log('Engineer',Engineer.length);
 var Long = _.filter(Game.creep, (creep) => creep.memory.role === 'Long');
 
-for (var creep of Object.values(Game.creeps)) {
- var memory = creep.memory;
- if(!creep || !creep.memory) continue; 
-  if(memory.role == "Harvester") {roleHarvester.run(creep);}
-  else if(memory.role == 'Upgrader') {roleUpgrader.run(creep);}
-  else if(memory.role == 'Builder') {roleBuilder.run(creep);}
-  else if(memory.role == 'Engineer') {roleEngineer.run(creep);}
-  else if(memory.role == 'Long') {roleLong.run(creep);}
-  else if(memory.role == "Runner") {roleRunner.run(creep);} //Do this for all the roles
-  else if(memory.role == 'superHarvester') {roleSuperHarvester.run(creep);}
-  }
-
+   for (let creep of harvester) {
+        roleHarvester.run(creep);
+    }
+    for (let creep of runners) {
+        roleRunner.run(creep);
+    }
+    for (let creep of superHarvester) {
+        roleSuperHarvester.run(creep);
+    }
+    for (let creep of Upgrader) {
+        roleUpgrader.run(creep);
+    }
+    for (let creep of Builder) {
+        roleBuilder.run(creep);
+    }
+    for (let creep of Engineer) {
+        roleEngineer.run(creep);
+    }
+    for (let creep of Long) {
+        roleLong.run(creep);
+    }
+ spawning(runners, superHarvester, harvester, Upgrader, Builder, Engineer, Long)
   let room = 'E27S58';
 if(Structure) {
     if(structureTower) {
@@ -51,10 +61,20 @@ if(Structure) {
 allyModel.sync();
  spawnModule.exampleFunction();
     var result = spawnModule.exampleFunction2(10);
-    spawning(runners, superHarvester, harvester, Upgrader, Builder, Engineer, Long)
+   
+
+
 }
   
-
+if (Game.spawns['Spawn1'].spawning) {
+        let spawningCreep = Game.creeps[Game.spawns['Spawn1'].spawning.name];
+        Game.spawns['Spawn1'].room.visual.text(
+            '🛠️' + spawningCreep.memory.role,
+            Game.spawns['Spawn1'].pos.x + 1,
+            Game.spawns['Spawn1'].pos.y,
+            {align: 'left', opacity: 0.8}
+        );
+    }
 
 function spawning(runners, superHarvester, harvester, Upgrader, Builder, Engineer, Long) {
     const spawn = Game.spawns['Spawn1'];
@@ -67,7 +87,7 @@ function spawning(runners, superHarvester, harvester, Upgrader, Builder, Enginee
     let totalLongs = Long.length;
 
     if (!spawn.spawning) {
-        if (totalRunners < 2) {
+        if (totalRunners < 1) {
             let newName = 'Runner' + Game.time;
             console.log('Spawning new runner:', newName);
             spawn.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'Runner' } });
@@ -79,7 +99,7 @@ function spawning(runners, superHarvester, harvester, Upgrader, Builder, Enginee
             spawn.spawnCreep([WORK, WORK, CARRY, CARRY, MOVE], newName, { memory: { role: 'superHarvester' } });
             return;
         }
-        else if (totalHarvesters < 4) {
+        else if (totalHarvesters < 2) {
             let newName = 'Harvester' + Game.time;
             console.log('Spawning new Harvester:', newName);
             spawn.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'Harvester' } });
@@ -103,7 +123,7 @@ function spawning(runners, superHarvester, harvester, Upgrader, Builder, Enginee
             spawn.spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'Engineer' } });
             return;
         }
-        else if (totalLongs < 4) {
+        else if (totalLongs < 2) {
             let newName = 'Long' + Game.time;
             console.log('Spawning new Long:', newName);
             spawn.spawnCreep([RANGED_ATTACK, MOVE], newName, { memory: { role: 'Long' } });
@@ -111,5 +131,3 @@ function spawning(runners, superHarvester, harvester, Upgrader, Builder, Enginee
         }
     }
 }
-
-
