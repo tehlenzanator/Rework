@@ -1,0 +1,70 @@
+Creep.prototype.roleEngineer = function() {
+        // Determine if the this is building or needs energy
+        if (this.store[RESOURCE_ENERGY] === 0) {
+            this.memory.building = false; // Needs energy
+        } else {
+            this.memory.building = true; // Has energy for repairs
+        }
+
+        if (!this.memory.building) {
+            // Try to withdraw from storage first
+            let storage = this.room.find(FIND_MY_STRUCTURES, {
+                filter: (structure) => structure.structureType === STRUCTURE_STORAGE &&
+                                       structure.store[RESOURCE_ENERGY] > 0
+            });
+
+            if (storage.length > 0) {
+                const target = storage[0];
+                if (this.withdraw(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                    this.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' } });
+                }
+                return;
+            }
+
+            // If storage is unavailable, harvest from sources
+            const sources = this.room.find(FIND_SOURCES);
+            if (sources.length > 0) {
+                const source = sources[0];
+                if (this.harvest(source) === ERR_NOT_IN_RANGE) {
+                    this.moveTo(source, { visualizePathStyle: { stroke: '#ffaa00' } });
+                }
+            }
+            return;
+        }
+
+        // If this has energy, prioritize repairs
+        let structures = this.room.find(FIND_STRUCTURES, {
+            filter: (structure) => {
+                return (structure.structureType === STRUCTURE_WALL && structure.hits < structure.hitsMax / 100000) ||
+                        (structure.structureType === STRUCTURE_RAMPART && structure.hits < structure.hitsMax)
+                    }
+        });
+
+        if (structures.length > 0) {
+            const target = structures[0];
+            if (this.repair(target) === ERR_NOT_IN_RANGE) {
+                this.moveTo(target, { visualizePathStyle: { stroke: '#ffffff' } });
+            }
+        } else {
+            // Deposit excess energy into containers if repairs aren't needed
+            let targets = this.room.find(FIND_MY_STRUCTURES, {
+                filter: (structure) => structure.structureType === STRUCTURE_CONTAINER &&
+                                       structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+            });
+
+            if (targets.length > 0) {
+                const target = targets[0];
+                if (this.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                    this.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' } });
+                }
+            } else {
+                //harvest and store if nothing else 
+                var sources = this.room.find(FIND_SOURCES);
+                if(this.harvest(sources[0]) === ERR_NOT_IN_RANGE) {
+                    this.moveTo(sources[0])
+                    }
+                }
+            }
+        }
+    
+
