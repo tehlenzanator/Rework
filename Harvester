@@ -1,0 +1,65 @@
+// Remove the entire module.exports at the bottom
+
+// Wrap the entire object in a prototype structure
+Creep.prototype.roleHarvester = function() {
+    // Check if the creep is valid
+    if (!this || !this.store) {
+        console.log('Creep is undefined or has no store, skipping execution.');
+        return;
+    }
+
+    // Replace all instances of 'creep' with 'this'
+    // The rest of the code remains largely the same
+    if (this.store.getFreeCapacity() > 0) {
+        const sources = this.room.find(FIND_SOURCES);
+        const availableSources = sources.filter(source => {
+            return !source.pos.findInRange(FIND_CREEPS, 1, {
+                filter: (otherCreep) => otherCreep.id !== this.id && otherCreep.memory.role === 'harvester'}).length;
+        });
+
+        if (availableSources.length > 0) {
+            const closestSource = this.pos.findClosestByPath(availableSources);
+            if (this.harvest(closestSource) === ERR_NOT_IN_RANGE) {
+                this.moveTo(closestSource, { visualizePathStyle: { stroke: '#ffaa00' } });
+            }
+        }
+    } else {
+        const lastSource = this.memory.lastSource;
+        const containers = this.room.find(FIND_STRUCTURES, {
+            filter: structure => structure.structureType === STRUCTURE_STORAGE &&
+                                 structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+        });
+
+        if (lastSource && containers.length > 0) {
+            const closestContainer = this.pos.findClosestByPath(containers);
+            if (this.transfer(closestContainer, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                this.moveTo(closestContainer, { visualizePathStyle: { stroke: '#ffffff' } });
+            }
+        } else {
+            const spawner = this.room.find(FIND_MY_SPAWNS)[0];
+            if (spawner && spawner.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+                if (this.transfer(spawner, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                    this.moveTo(spawner, { visualizePathStyle: { stroke: '#ffffff' } });
+                }
+            } else {
+                const extension = this.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+                    filter: structure => structure.structureType === STRUCTURE_EXTENSION &&
+                                         structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                });
+
+                if (extension) {
+                    if (this.transfer(extension, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                        this.moveTo(extension, { visualizePathStyle: { stroke: '#ffffff' } });
+                    }
+                }
+            }
+        }
+    }
+};
+
+// If you still want to export something for potential external use
+module.exports = {
+    run: function(creep) {
+        creep.roleHarvester();
+    }
+};
